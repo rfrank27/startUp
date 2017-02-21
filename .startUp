@@ -1,0 +1,165 @@
+#!/bin/bash
+
+# Meta
+STARTUP="/home/me/.startUp"
+alias SUP="chmod a+x $STARTUP; . $STARTUP"
+alias ESUP="vim $STARTUP;SUP"
+alias CUP="cat $STARTUP"
+
+# Package managing
+alias GET="sudo apt-get install -y"
+alias UNGET="sudo apt-get remove -y"
+alias ADDGET="sudo add-apt-repository -y"
+alias UPDATE="sudo apt-get update -y; sudo apt-get upgrade -y"
+alias UNTAR="tar -xzf"
+UNZIP() {
+	tar xvzf $1
+	rm $1
+}
+alias PIPGET="sudo pip install"
+
+# Convienence
+alias echo="echo -e"
+alias ECHO="/bin/echo"
+alias imout="sudo pm-hibernate"
+alias vd="ls ~/Downloads/"
+alias mkx="chmod -v +x *"
+alias studio="~/Desktop/Hax/Apps/android-studio/bin/studio.sh &"
+alias geny="~/Desktop/Hax/Apps/genymotion/genymotion &"
+alias adb="~/Android/Sdk/platform-tools/adb"
+alias apktool="java -jar ~/Desktop/Hax/Apps/apktool.jar"
+alias olly="wine ~/Desktop/Programs/maltools/odbg110/OLLYDBG.EXE &"
+alias floss="~/Desktop/Programs/maltools/floss"
+alias setclip="xclip -selection c"
+alias getclip="xclip -selection clipboard -o"
+alias L="exit"
+alias gparted="sudo gparted"
+n() {
+	$(echo "$(alias $1)" | sed "s/alias $1=//" | sed "s/'//g" | sed "s/;.*//")
+	clear;ls
+	vim classnotes
+}
+alias yay="echo You did it!!"
+alias ping="ping -c 4"
+alias pushNotes="cat classnotes >> allNotes;cat classnotes | setclip;echo '' > classnotes; echo 'Notes pushed'"
+alias pg="ping -c 2 8.8.8.8"
+
+# Workspace Managing
+alias goLeft="xte 'keydown Control_R' 'keydown Alt_R' 'keydown Left' 'keyup Control_R' 'keyup Alt_R' 'keyup Left'"
+alias goRight="xte 'keydown Control_R' 'keydown Alt_R' 'keydown Right' 'keyup Control_R' 'keyup Alt_R' 'keyup Right'"
+alias goUp="xte 'keydown Control_R' 'keydown Alt_R' 'keydown Up' 'keyup Control_R' 'keyup Alt_R' 'keyup Up'"
+alias goDown="xte 'keydown Control_R' 'keydown Alt_R' 'keydown Down' 'keyup Control_R' 'keyup Alt_R' 'keyup Down'"
+gotoWorkspace() {
+	counter=$1
+	goUp && goUp && goUp && goLeft && goLeft && goLeft && goLeft && goLeft
+	while [ $counter -gt 5 ]; do
+		goDown
+		let counter-=5
+	done
+	while [ $counter -gt 1 ]; do
+		goRight
+		let counter-=1
+	done
+	#goUp;goUp;goUp;goLeft;goLeft;goLeft;goLeft;goLeft
+}
+arrangeWorkspaces() {
+	while read line; do
+		wmctrl -R $line &&
+		#sleep 1
+		xte 'keydown Super_L' 'keydown Up' 'keydown Control_L' 'keyup Super_L' 'keyup Up' 'keyup Control_L' && 
+		xte 'keydown Shift_L' &&
+		#sleep 1
+		gotoWorkspace $(echo $line | grep -o [0-9].*) &&
+		sleep .5
+		xte 'keyup Shift_L' &&
+		xte 'keydown Super_L' 'keydown Up' 'keydown Control_L' 'keyup Super_L' 'keyup Up' 'keyup Control_L' 
+	done < $1
+	gotoWorkspace 0
+}
+
+# Navigation
+alias c="clear"
+alias cls="clear;ls"
+alias cla="clear;ls -A"
+alias ld="ls -d */"
+alias lda="ls -dA */"
+alias la="ls -A"
+alias lg="ls -A | grep"
+mkdir() {
+	/bin/mkdir $1
+	cd $1
+	clear
+}
+cdl() {
+	cd $1
+	clear
+	ls
+}
+alias u="cd .."
+alias uu="cd ../.."
+alias uuu="cd ../../.."
+alias uuuu="cd ../../../.."
+alias uuuuu="cd ../../../../../"
+alias lsc="la | wc"
+
+# Alias managment
+grab() {
+	if [ $1 == "a" ] ;then
+		cat /home/me/.Templates/.aliases > .aliases
+		vim .aliases
+		chmod +x .aliases; . .aliases
+	fi
+}
+alias rpa=". /home/me/.Templates/.pathAliases;echo 'path aliases set'"
+alias shpa="cat /home/me/.Templates/.pathAliases;. /home/me/.Templates/.pathAliases"
+alias epa="vim /home/me/.Templates/.pathAliases"
+mkpa() {
+	echo "Would you like to add the following to ~/.pathAliases? [y|n]\n$(pwd)\n"
+	read IN
+	if [ $IN == "y" ];then
+		NEWPATHALIAS="alias $1=\"cd $(pwd);cls\""
+		echo $NEWPATHALIAS >> /home/me/.Templates/.pathAliases
+		. /home/me/.Templates/.pathAliases
+		echo "----------\nPath Aliases\n----------"
+		shpa
+	fi
+}
+
+# vim
+alias evim="vim ~/.vimrc"
+alias VIM="sudo vim"
+alias rswp="ls -A | grep '\\.sw.$' | xargs rm -f"
+
+# music
+alias y-dl="youtube-dl -icx --yes-playlist --audio-format mp3"
+alias sim-dl="youtube-dl -se --get-duration"
+mkplaylist() {
+	path="$(echo /run/user/1000/gvfs)"
+	if [ -z $path ];then
+		echo "No Phone connected"
+	else
+		echo $path
+		echo $1
+		mkdir "$1.playlist"
+		. cd $1.playlist
+		while read line
+		do
+			adb pull "$(echo $line|tr -d '\r')"
+		done < "../$1" &&
+		zip -r $1.zip $1.playlist &&
+		rm -rf $1.playlist
+		cd ../
+	fi
+}
+
+# Visual
+gsettings set org.gnome.desktop.background show-desktop-icons false
+. /home/me/.Templates/.pathAliases
+COLOR1="0;31"
+#PS1=\\e\[$COLOR1$(whoami)\\e\[m:\\w\\$ 
+PS1=\\[\\]${debian_chroot:+($debian_chroot)}\\[\\]\\u@\\h\\[\\]:\\[\\]\\w\\[\\]\\$
+#export PS1="\e[1;$(echo $RANDOM % 7 + 30 | bc)m$(whoami)\e[m:\e[1;$(echo $RANDOM % 7 + 30| bc)m\w\e[m$"
+export PS1="\\[\e[1;30m\]$(whoami)\\[\e[m:\e[1;31m\]\w\\[\e[m\]$"
+changeTitle() {
+	echo -ne "\033]0;$1\007"
+}
