@@ -34,6 +34,14 @@ alias setclip="xclip -selection c"
 alias getclip="xclip -selection clipboard -o"
 alias L="exit"
 alias gparted="sudo gparted"
+wiggle() {
+	while :
+	do
+		xte 'mousermove 5 0'
+		xte 'mousermove -5 0'
+		sleep 2
+	done
+}
 n() {
 	$(echo "$(alias $1)" | sed "s/alias $1=//" | sed "s/'//g" | sed "s/;.*//")
 	clear;ls
@@ -60,7 +68,6 @@ gotoWorkspace() {
 		goRight
 		let counter-=1
 	done
-	#goUp;goUp;goUp;goLeft;goLeft;goLeft;goLeft;goLeft
 }
 arrangeWorkspaces() {
 	while read line; do
@@ -76,6 +83,7 @@ arrangeWorkspaces() {
 	done < $1
 	gotoWorkspace 0
 }
+alias aw="arrangeWorkspaces ~/.windows"
 
 # Navigation
 alias c="clear"
