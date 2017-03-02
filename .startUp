@@ -52,7 +52,7 @@ alias ping="ping -c 4"
 alias pushNotes="cat classnotes >> allNotes;cat classnotes | setclip;echo '' > classnotes; echo 'Notes pushed'"
 alias pg="ping -c 2 8.8.8.8"
 
-# Workspace Managing
+# Workspace Managing (requires xautomation)
 alias goLeft="xte 'keydown Control_R' 'keydown Alt_R' 'keydown Left' 'keyup Control_R' 'keyup Alt_R' 'keyup Left'"
 alias goRight="xte 'keydown Control_R' 'keydown Alt_R' 'keydown Right' 'keyup Control_R' 'keyup Alt_R' 'keyup Right'"
 alias goUp="xte 'keydown Control_R' 'keydown Alt_R' 'keydown Up' 'keyup Control_R' 'keyup Alt_R' 'keyup Up'"
