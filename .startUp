@@ -52,23 +52,44 @@ alias ping="ping -c 4"
 alias pushNotes="cat classnotes >> allNotes;cat classnotes | setclip;echo '' > classnotes; echo 'Notes pushed'"
 alias pg="ping -c 2 8.8.8.8"
 
-# Workspace Managing (requires xautomation)
+# Workspace Managing (requires xautomation, Compiz)
 alias goLeft="xte 'keydown Control_R' 'keydown Alt_R' 'keydown Left' 'keyup Control_R' 'keyup Alt_R' 'keyup Left'"
 alias goRight="xte 'keydown Control_R' 'keydown Alt_R' 'keydown Right' 'keyup Control_R' 'keyup Alt_R' 'keyup Right'"
 alias goUp="xte 'keydown Control_R' 'keydown Alt_R' 'keydown Up' 'keyup Control_R' 'keyup Alt_R' 'keyup Up'"
 alias goDown="xte 'keydown Control_R' 'keydown Alt_R' 'keydown Down' 'keyup Control_R' 'keyup Alt_R' 'keyup Down'"
+
+#At the moment, this only works with Compiz, reading it's plugin files.
+#To get rid of that dependancy, replace HSIZE with the number of columns of workspaces, and VSIZE with the number of rows of workspaces.
+HSIZE=`dconf read /org/compiz/profiles/unity/plugins/core/hsize`
+VSIZE=`dconf read /org/compiz/profiles/unity/plugins/core/vsize`
+
 gotoWorkspace() {
-	counter=$1
-	goUp && goUp && goUp && goLeft && goLeft && goLeft && goLeft && goLeft
-	while [ $counter -gt 5 ]; do
-		goDown
-		let counter-=5
-	done
-	while [ $counter -gt 1 ]; do
-		goRight
-		let counter-=1
-	done
-}
+        counter=$1
+
+        #Move to top-left workspace
+        tempCounter=$HSIZE
+        while [ $tempCounter -gt 0 ]; do
+                echo $tempCounter
+                goLeft
+                let tempCounter-=1
+        done
+        tempCounter=$VSIZE
+        while [ $tempCounter -gt 0 ]; do
+                echo $tempCounter
+                goUp
+                let tempCounter-=1
+        done
+
+        #Move down and to the right.
+        while [ $counter -gt $HSIZE ]; do #Acts as a modulo.
+                goDown
+                let counter-=$HSIZE
+        done
+        while [ $counter -gt 1 ]; do
+                goRight
+                let counter-=1
+        done
+}       
 arrangeWorkspaces() {
 	while read line; do
 		wmctrl -R $line &&
